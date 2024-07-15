@@ -16,8 +16,8 @@ def find_hightlight_text(page, rect) -> tuple[str, str]:
     # ищем по координатам текста (w[:4]) выделенной аннотацией области (rect)
     words.sort(key=lambda w: (w[3], w[0]))
     mywordvalues = [w for w in words if fitz.Rect(w[:4]).intersects(rect)]
-    # для нахождения значений в 1м столбце, берём всю ширину листа (x0, x1) и высоту от rect (y0, y1)
-    mywordskeys = [w for w in words if fitz.Rect(w[:4]).intersects(fitz.Rect(5, rect[1], page.rect.width, rect[3]))]
+    # для нахождения значений в 1м столбце, берём всю ширину листа (x0, rec[0]) и высоту от rect (y0, y1)
+    mywordskeys = [w for w in words if fitz.Rect(w[:4]).intersects(fitz.Rect(5, rect[1], rect[0], rect[3]))]
 
     groupvalues = groupby(mywordvalues, key=lambda w: w[3])
     group = groupby(mywordskeys, key=lambda w: w[3])
@@ -26,24 +26,17 @@ def find_hightlight_text(page, rect) -> tuple[str, str]:
     # соединяем полученные отдельные слова (под созданным нами rect) в текст для key
     for y1, gwords in group:
         # print(" ".join(w[4] for w in gwords))
-        result.append(" ".join(w[4] for w in gwords).split())
-
+        result.append(" ".join(w[4] for w in gwords))
     # соединяем полученные отдельные слова (под созданным нами rect) в текст для value
     resultvalues = []  # массив слов values [[]]
     for y1, gwords in groupvalues:
         # print(" ".join(w[4] for w in gwords))
-        resultvalues.append(" ".join(w[4] for w in gwords).split())
+        resultvalues.append(" ".join(w[4] for w in gwords))
 
-    result2 = []
-    # из массива переходим в список и убираем из него значения values
-    for row in result:
-        for value in row[:]:
-            if value not in resultvalues[0]:
-                result2.append(value)
+    result = " ".join(result)
+    resultvalues = " ".join(resultvalues)
 
-    result2 = " ".join(result2)
-    resultvalues = " ".join(resultvalues[0])
-    return result2, resultvalues
+    return result, resultvalues
 
 
 def find_annots(input_path: str) -> dict:
