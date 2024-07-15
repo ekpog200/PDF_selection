@@ -39,7 +39,12 @@ def highlighting_text(htext: dict, processed_path: str, output_path: str) -> Non
             for tab in tabs:
                 # проходим по каждой ячейке, находим совпадения с данными из input_documents и выделяем 2й столбец
                 for i, line in enumerate(tab.extract()):
-                    if line[0].replace('\n', ' ') in htext.keys():
-                        add_highlight(page, fitz.Rect(tab.rows[i].cells[1]))
+                    for k in htext.keys():
+                        if k in line[0].replace('\n', ' '):
+                            # print(line[0].replace('\n', ' '))
+                            add_highlight(page, fitz.Rect(tab.rows[i].cells[1]))
+
+                    # if line[0].replace('\n', ' ') in htext.keys():
+                    #     add_highlight(page, fitz.Rect(tab.rows[i].cells[1]))
         doc.save(os.path.join(output_path, file))
         doc.close()
